@@ -1,0 +1,30 @@
+package resolvers
+
+import (
+	"{{.Package}}/db"
+	"{{.Package}}/ent"
+	"{{.Package}}/{{.Config.GqlGen.Exec.Dir}}"
+
+	"github.com/99designs/gqlgen/graphql"
+)
+
+// This file will not be regenerated automatically.
+//
+// It serves as dependency injection for your app, add any dependencies you require here.
+
+type Resolver struct {
+	Client *ent.Client
+}
+
+var schema *graphql.ExecutableSchema
+
+// Singleton pattern applied on schema
+func ExecutableSchema() graphql.ExecutableSchema {
+	if schema == nil {
+		schema = new(graphql.ExecutableSchema)
+		*schema = {{.Config.GqlGen.Exec.Package}}.NewExecutableSchema({{.Config.GqlGen.Exec.Package}}.Config{Resolvers: &Resolver{
+			Client: db.Client,
+		}})
+	}
+	return *schema
+}

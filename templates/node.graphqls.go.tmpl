@@ -1,0 +1,9 @@
+extend type Query {
+  {{camel .Node}}(id: ID!): {{.Node}}!
+}
+
+extend type Mutation {
+  create{{.Node}}(input: Create{{.Node}}Input!): {{.Node}}!
+  update{{.Node}}(id: ID!, input: Update{{.Node}}Input!): {{.Node}}!
+  delete{{.Node}}(id: ID!): {{.Node}}!
+}

@@ -1,0 +1,33 @@
+package {{.Config.GqlGen.Resolver.Package}}
+
+// This file will be automatically regenerated based on the schema, any resolver implementations
+// will be copied through when generating and any unknown code will be moved to the end.
+
+import (
+	"{{.Package}}/ent"
+	"context"
+)
+
+// Create{{.Node}} is the resolver for the create{{.Node}} field.
+func (r *mutationResolver) Create{{.Node}}(ctx context.Context, input ent.Create{{.Node}}Input) (*ent.{{.Node}}, error) {
+	entity, err := ent.FromContext(ctx).{{.Node}}.Create().SetInput(input).Save(ctx)
+	return entity, err
+}
+
+// Update{{.Node}} is the resolver for the update{{.Node}} field.
+func (r *mutationResolver) Update{{.Node}}(ctx context.Context, id int, input ent.Update{{.Node}}Input) (*ent.{{.Node}}, error) {
+	entity, err := ent.FromContext(ctx).{{.Node}}.UpdateOneID(id).SetInput(input).Save(ctx)
+	return entity, err
+}
+
+// Delete{{.Node}} is the resolver for the delete{{.Node}} field.
+func (r *mutationResolver) Delete{{.Node}}(ctx context.Context, id int) (*ent.{{.Node}}, error) {
+	entity, _ := r.Client.{{.Node}}.Get(ctx, id)
+	err := ent.FromContext(ctx).{{.Node}}.DeleteOneID(id).Exec(ctx)
+	return entity, err
+}
+
+// {{.Node}} is the resolver for the {{camel .Node}} field.
+func (r *queryResolver) {{.Node}}(ctx context.Context, id int) (*ent.{{.Node}}, error) {
+	return r.Client.{{.Node}}.Get(ctx, id)
+}

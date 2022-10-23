@@ -1,0 +1,32 @@
+package {{.Config.GqlGen.Resolver.Package}}
+
+// This file will be automatically regenerated based on the schema, any resolver implementations
+// will be copied through when generating and any unknown code will be moved to the end.
+
+import (
+	"context"
+	"{{.Package}}/ent"
+	"{{.Package}}/graph/generated"
+)
+
+// Node is the resolver for the node field.
+func (r *queryResolver) Node(ctx context.Context, id int) (ent.Noder, error) {
+	return r.Client.Noder(ctx, id)
+}
+
+// Nodes is the resolver for the nodes field.
+func (r *queryResolver) Nodes(ctx context.Context, ids []int) ([]ent.Noder, error) {
+	return r.Client.Noders(ctx, ids)
+}
+
+{{- range .Nodes}}
+// {{plural .}} is the resolver for the {{plural .}} field.
+func (r *queryResolver) {{plural .}}(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.{{.}}Order, where *ent.{{.}}WhereInput) (*ent.{{.}}Connection, error) {
+	return r.Client.{{.}}.Query().Paginate(ctx, after, first, before, last, ent.With{{.}}Order(orderBy), ent.With{{.}}Filter(where.Filter))
+}
+{{end}}
+
+// Query returns generated.QueryResolver implementation.
+func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+
+type queryResolver struct{ *Resolver }
