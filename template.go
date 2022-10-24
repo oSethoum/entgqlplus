@@ -7,7 +7,7 @@ import (
 	"entgo.io/ent/entc/gen"
 )
 
-func parseTemplate(filename string, data *TemplateData) string {
+func parseTemplate(filename string, data *templateData) string {
 	buffer, err := assets.ReadFile("templates/" + filename)
 	catch(err)
 	t, err := template.New(filename).Funcs(gen.Funcs).Parse(string(buffer))

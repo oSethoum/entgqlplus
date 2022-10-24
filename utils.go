@@ -14,13 +14,13 @@ var (
 	snake = gen.Funcs["snake"].(func(string) string)
 )
 
-func writeFiles(files []File) {
+func writeFiles(files []file) {
 	for i := range files {
 		writeFile(files[i])
 	}
 }
 
-func writeFile(f File) {
+func writeFile(f file) {
 	err := os.MkdirAll(path.Dir(f.Path), 0666)
 	catch(err)
 	os.WriteFile(f.Path, []byte(f.Buffer), 0666)
@@ -44,10 +44,10 @@ func catch(err error) {
 	}
 }
 
-func readGqlGen(fpath string) GqlGen {
+func readGqlGen(fpath string) gqlGen {
 	buffer, err := os.ReadFile(fpath)
 	catch(err)
-	out := GqlGen{}
+	out := gqlGen{}
 	err = yaml.Unmarshal(buffer, &out)
 	catch(err)
 	out.Exec.Dir = path.Dir(out.Exec.FileName)
