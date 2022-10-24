@@ -10,14 +10,14 @@ import (
 type {{.}}Listenner struct {
 	Context context.Context
 	ID      int
-	Events   []{{$g.Config.GqlGen.Model.Package}}.Event
+	Event   {{$g.Config.GqlGen.Model.Package}}.Event
 	Channel chan *ent.{{.}}
 }
 
 type {{plural .}}Listenner struct {
 	Context context.Context
 	Channel chan *ent.{{.}}Connection
-	Events   []{{$g.Config.GqlGen.Model.Package}}.Event
+	Event   {{$g.Config.GqlGen.Model.Package}}.Event
 	Query   *{{$g.Config.GqlGen.Model.Package}}.{{plural .}}QueryInput
 }
 {{end}}

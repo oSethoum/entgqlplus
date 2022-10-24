@@ -19,7 +19,7 @@ input {{plural .Node}}QueryInput {
 }
 
 extend type Subscription {
-  {{plural .Node | camel}}(events: [Event!]!, query: {{plural .Node}}QueryInput): {{.Node}}Connection!
-  {{camel .Node}}(events: [Event!]!, id: ID!): {{.Node}}!
+  {{plural .Node | camel}}(event: Event!, query: {{plural .Node}}QueryInput): {{.Node}}Connection!
+  {{camel .Node}}(event: Event!, id: ID!): {{.Node}}!
 }
 {{- end}}

@@ -17,10 +17,10 @@ type Resolver struct {
 	Client *ent.Client
 	{{- if .Config.Subscription}}
 	{{range .Nodes}}
-	{{.}}Listenners        		  map[*chan *ent.{{.}}]{{.}}Listenner
+	{{.}}Listenners        		    map[*chan *ent.{{.}}]{{.}}Listenner
 	{{.}}ListennersMutext 			  sync.Mutex
-	{{plural .}}Listenners       map[*chan *ent.{{.}}Connection]{{plural .}}Listenner
-	{{plural .}}ListennersMutext sync.Mutex
+	{{plural .}}Listenners        map[*chan *ent.{{.}}Connection]{{plural .}}Listenner
+	{{plural .}}ListennersMutext  sync.Mutex
 	{{end}}
 	{{- end}}
 }

@@ -107,10 +107,6 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 					Buffer: parseTemplate("notifiers.go.tmpl", data),
 				},
 				file{
-					Path:   path.Join(resolverDir, "utils.go"),
-					Buffer: parseTemplate("utils.go.tmpl", data),
-				},
-				file{
 					Path:   path.Join(resolverDir, "types.go"),
 					Buffer: parseTemplate("types.go.tmpl", data),
 				},

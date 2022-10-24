@@ -9,7 +9,7 @@ import (
 func Notify{{plural .}}Listenners(r *mutationResolver, event {{$g.Config.GqlGen.Model.Package}}.Event) {
 	r.{{plural .}}ListennersMutext.Lock()
 	for key := range r.{{plural .}}Listenners {
-		if EventIn(event, r.{{plural .}}Listenners[key].Events) {
+		if event == r.{{plural .}}Listenners[key].Event {
 			query := r.{{plural .}}Listenners[key].Query
 			if query == nil {
 				query = &{{$g.Config.GqlGen.Model.Package}}.{{plural .}}QueryInput{}
@@ -29,7 +29,7 @@ func Notify{{plural .}}Listenners(r *mutationResolver, event {{$g.Config.GqlGen.
 func Notify{{.}}Listenners(r *mutationResolver, event {{$g.Config.GqlGen.Model.Package}}.Event, entity *ent.{{.}}) {
 	r.{{.}}ListennersMutext.Lock()
 	for key := range r.{{.}}Listenners {
-		if EventIn(event, r.{{.}}Listenners[key].Events) && r.{{.}}Listenners[key].ID == entity.ID {
+		if event == r.{{.}}Listenners[key].Event && r.{{.}}Listenners[key].ID == entity.ID {
 			r.{{.}}Listenners[key].Channel <- entity
 		}
 	}
