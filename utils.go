@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	camel = gen.Funcs["camel"].(func(string) string)
 	snake = gen.Funcs["snake"].(func(string) string)
 )
 

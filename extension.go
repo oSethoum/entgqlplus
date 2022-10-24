@@ -146,6 +146,8 @@ func NewExtension(opts ...extensionOption) *extension {
 		opts[i](ex)
 	}
 
+	gen.Funcs["camel"] = func(s string) string { return camel(snake(s)) }
+
 	ex.config.GqlGen = readGqlGen(ex.config.GqlGenPath)
 	ex.hooks = append(ex.hooks, ex.generate)
 	return ex

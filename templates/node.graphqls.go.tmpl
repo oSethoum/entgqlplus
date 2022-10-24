@@ -7,6 +7,7 @@ extend type Mutation {
   update{{.Node}}(id: ID!, input: Update{{.Node}}Input!): {{.Node}}!
   delete{{.Node}}(id: ID!): {{.Node}}!
 }
+
 {{- if .Config.Subscription}}
 input {{plural .Node}}QueryInput {
   after: Cursor
