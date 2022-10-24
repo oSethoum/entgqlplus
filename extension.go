@@ -11,13 +11,13 @@ import (
 //go:embed templates
 var assets embed.FS
 
-type Extension struct {
+type extension struct {
 	entc.DefaultExtension
 	hooks  []gen.Hook
 	config *config
 }
 
-func (e *Extension) Generate(next gen.Generator) gen.Generator {
+func (e *extension) generate(next gen.Generator) gen.Generator {
 	return gen.GenerateFunc(func(g *gen.Graph) error {
 		files := []file{}
 		schemaDir := path.Join(path.Dir(e.config.GqlGenPath), path.Dir(e.config.GqlGen.Schema[0]))
@@ -106,12 +106,12 @@ func (e *Extension) Generate(next gen.Generator) gen.Generator {
 	})
 }
 
-func (e *Extension) Hooks() []gen.Hook {
+func (e *extension) Hooks() []gen.Hook {
 	return e.hooks
 }
 
-func NewExtension(opts ...ExtensionOption) *Extension {
-	ex := &Extension{
+func NewExtension(opts ...extensionOption) *extension {
+	ex := &extension{
 		// Default Config
 		config: &config{
 			FileUpload:   false,
@@ -130,6 +130,6 @@ func NewExtension(opts ...ExtensionOption) *Extension {
 	}
 
 	ex.config.GqlGen = readGqlGen(ex.config.GqlGenPath)
-	ex.hooks = append(ex.hooks, ex.Generate)
+	ex.hooks = append(ex.hooks, ex.generate)
 	return ex
 }

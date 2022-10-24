@@ -9,7 +9,7 @@ type (
 	}
 
 	config struct {
-		Database     Database
+		Database     database
 		Echo         bool
 		JWT          bool
 		Mutation     bool
