@@ -6,7 +6,7 @@ package {{.Config.GqlGen.Resolver.Package}}
 import (
 	"context"
 	"{{.Package}}/ent"
-	"{{.Package}}/graph/generated"
+	"{{.Package}}/{{.Config.GqlGen.Exec.Dir}}"
 )
 
 // Node is the resolver for the node field.
@@ -26,7 +26,7 @@ func (r *queryResolver) {{plural .}}(ctx context.Context, after *ent.Cursor, fir
 }
 {{end}}
 
-// Query returns generated.QueryResolver implementation.
-func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+// Query returns {{.Config.GqlGen.Exec.Package}}.QueryResolver implementation.
+func (r *Resolver) Query() {{.Config.GqlGen.Exec.Package}}.QueryResolver { return &queryResolver{r} }
 
 type queryResolver struct{ *Resolver }

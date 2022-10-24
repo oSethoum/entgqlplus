@@ -33,6 +33,7 @@ type (
 		} `yaml:"exec"`
 		Model struct {
 			FileName string `yaml:"filename"`
+			Dir      string
 			Package  string `yaml:"package"`
 		} `yaml:"model"`
 		Resolver struct {

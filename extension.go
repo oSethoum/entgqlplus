@@ -100,6 +100,23 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 			)
 		}
 
+		if e.config.Subscription {
+			files = append(files,
+				file{
+					Path:   path.Join(resolverDir, "notifiers.go"),
+					Buffer: parseTemplate("notifiers.go.tmpl", data),
+				},
+				file{
+					Path:   path.Join(resolverDir, "utils.go"),
+					Buffer: parseTemplate("utils.go.tmpl", data),
+				},
+				file{
+					Path:   path.Join(resolverDir, "types.go"),
+					Buffer: parseTemplate("types.go.tmpl", data),
+				},
+			)
+		}
+
 		writeFiles(files)
 
 		return next.Generate(g)

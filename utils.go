@@ -51,5 +51,6 @@ func readGqlGen(fpath string) gqlGen {
 	err = yaml.Unmarshal(buffer, &out)
 	catch(err)
 	out.Exec.Dir = path.Dir(out.Exec.FileName)
+	out.Model.Dir = path.Dir(out.Model.FileName)
 	return out
 }

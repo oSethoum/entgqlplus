@@ -1,0 +1,23 @@
+package {{.Config.GqlGen.Resolver.Package}}
+
+import (
+	"{{.Package}}/ent"
+	"{{.Package}}/{{.Config.GqlGen.Model.Dir}}"
+	"context"
+)
+{{$g := .}}
+{{range .Nodes}}
+type {{.}}Listenner struct {
+	Context context.Context
+	ID      int
+	Events   []{{$g.Config.GqlGen.Model.Package}}.Event
+	Channel chan *ent.{{.}}
+}
+
+type {{plural .}}Listenner struct {
+	Context context.Context
+	Channel chan *ent.{{.}}Connection
+	Events   []{{$g.Config.GqlGen.Model.Package}}.Event
+	Query   *{{$g.Config.GqlGen.Model.Package}}.{{plural .}}QueryInput
+}
+{{end}}

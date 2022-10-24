@@ -7,3 +7,18 @@ extend type Mutation {
   update{{.Node}}(id: ID!, input: Update{{.Node}}Input!): {{.Node}}!
   delete{{.Node}}(id: ID!): {{.Node}}!
 }
+{{- if .Config.Subscription}}
+input {{plural .Node}}QueryInput {
+  after: Cursor
+  first: Int
+  before: Cursor
+  last: Int
+  orderBy: {{.Node}}Order
+  where: {{.Node}}WhereInput
+}
+
+extend type Subscription {
+  {{plural .Node | camel}}(events: [Event!]!, query: {{plural .Node}}QueryInput): {{.Node}}Connection!
+  {{camel .Node}}(events: [Event!]!, id: ID!): {{.Node}}!
+}
+{{- end}}

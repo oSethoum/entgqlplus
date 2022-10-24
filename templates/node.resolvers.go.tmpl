@@ -4,30 +4,107 @@ package {{.Config.GqlGen.Resolver.Package}}
 // will be copied through when generating and any unknown code will be moved to the end.
 
 import (
-	"{{.Package}}/ent"
 	"context"
+	"{{.Package}}/ent"
+	"{{.Package}}/{{.Config.GqlGen.Model.Dir}}"
 )
+
+// {{.Node}} is the resolver for the {{.Node}} field.
+func (r *queryResolver) {{.Node}}(ctx context.Context, id int) (*ent.{{.Node}}, error) {
+   return r.Client.{{.Node}}.Get(ctx, id)
+}
 
 // Create{{.Node}} is the resolver for the create{{.Node}} field.
 func (r *mutationResolver) Create{{.Node}}(ctx context.Context, input ent.Create{{.Node}}Input) (*ent.{{.Node}}, error) {
+	{{- if .Config.Subscription}}
 	entity, err := ent.FromContext(ctx).{{.Node}}.Create().SetInput(input).Save(ctx)
+
+	if err == nil {
+      go Notify{{.Node}}Listenners(r, {{.Config.GqlGen.Model.Package}}.EventCreate, entity)
+      go Notify{{plural .Node}}Listenners(r, {{.Config.GqlGen.Model.Package}}.EventCreate)
+   }
+
 	return entity, err
+	{{- else}}
+	return ent.FromContext(ctx).{{.Node}}.Create().SetInput(input).Save(ctx)
+	{{- end}}
 }
 
 // Update{{.Node}} is the resolver for the update{{.Node}} field.
 func (r *mutationResolver) Update{{.Node}}(ctx context.Context, id int, input ent.Update{{.Node}}Input) (*ent.{{.Node}}, error) {
+  {{- if .Config.Subscription}}
 	entity, err := ent.FromContext(ctx).{{.Node}}.UpdateOneID(id).SetInput(input).Save(ctx)
-	return entity, err
+   
+   if err == nil {
+      go Notify{{.Node}}Listenners(r, {{.Config.GqlGen.Model.Package}}.EventUpdate, entity)
+      go Notify{{plural .Node}}Listenners(r, {{.Config.GqlGen.Model.Package}}.EventUpdate)
+   }
+
+  return entity, err
+	{{- else}}
+	return ent.FromContext(ctx).{{.Node}}.UpdateOneID(id).SetInput(input).Save(ctx)
+	{{- end}}
 }
 
 // Delete{{.Node}} is the resolver for the delete{{.Node}} field.
 func (r *mutationResolver) Delete{{.Node}}(ctx context.Context, id int) (*ent.{{.Node}}, error) {
-	entity, _ := r.Client.{{.Node}}.Get(ctx, id)
-	err := ent.FromContext(ctx).{{.Node}}.DeleteOneID(id).Exec(ctx)
-	return entity, err
+	{{- if .Config.Subscription}}
+	entity, err := r.Client.{{.Node}}.Get(ctx, id)
+	if err == nil {
+      go Notify{{.Node}}Listenners(r, {{.Config.GqlGen.Model.Package}}.EventDelete, entity)
+      go Notify{{plural .Node}}Listenners(r, {{.Config.GqlGen.Model.Package}}.EventDelete)
+   }
+	{{- else}}
+	entity := r.Client.{{.Node}}.Get(ctx, id)
+	{{- end}}
+	return entity, ent.FromContext(ctx).{{.Node}}.DeleteOneID(id).Exec(ctx)
 }
 
-// {{.Node}} is the resolver for the {{camel .Node}} field.
-func (r *queryResolver) {{.Node}}(ctx context.Context, id int) (*ent.{{.Node}}, error) {
-	return r.Client.{{.Node}}.Get(ctx, id)
+{{- if .Config.Subscription}}
+// {{plural .Node}} is the resolver for the {{plural .Node | camel}} field.
+func (r *subscriptionResolver) {{plural .Node}}(ctx context.Context, events []{{.Config.GqlGen.Model.Package}}.Event, query *{{.Config.GqlGen.Model.Package}}.{{plural .Node}}QueryInput) (<-chan *ent.{{.Node}}Connection, error) {
+	events = RemoveDuplicates(events)
+	channel := make(chan *ent.{{.Node}}Connection, 1)
+	r.{{plural .Node}}ListennersMutext.Lock()
+	r.{{plural .Node}}Listenners[&channel] = {{plural .Node}}Listenner{
+		Context: ctx,
+		Channel: channel,
+		Events:   events,
+		Query:   query,
+	}
+	r.{{plural .Node}}ListennersMutext.Unlock()
+
+	go func() {
+		<-ctx.Done()
+		r.{{plural .Node}}ListennersMutext.Lock()
+		delete(r.{{plural .Node}}Listenners, &channel)
+		r.{{plural .Node}}ListennersMutext.Unlock()
+	}()
+
+	return channel, nil
 }
+
+
+// {{.Node}} is the resolver for the {{.Node}} field.
+func (r *subscriptionResolver) {{.Node}}(ctx context.Context, events []{{.Config.GqlGen.Model.Package}}.Event, id int) (<-chan *ent.{{.Node}}, error) {
+	events = RemoveDuplicates(events)
+	channel := make(chan *ent.{{.Node}}, 1)
+	r.{{.Node}}ListennersMutext.Lock()
+	r.{{.Node}}Listenners[&channel] = {{.Node}}Listenner{
+		Context: ctx,
+		ID:      id,
+		Channel: channel,
+		Events:   events,
+	}
+	r.{{.Node}}ListennersMutext.Unlock()
+
+	go func() {
+		<-ctx.Done()
+		r.{{.Node}}ListennersMutext.Lock()
+		delete(r.{{.Node}}Listenners, &channel)
+		r.{{.Node}}ListennersMutext.Unlock()
+	}()
+
+	return channel, nil
+}
+{{- end}}
