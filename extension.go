@@ -50,11 +50,11 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 				data.Node = data.Nodes[i]
 				files = append(files,
 					file{
-						Path:   path.Join(resolverDir, snake(data.Node)+".resolvers.go"),
+						Path:   path.Join(resolverDir, snake(data.Node.Name)+".resolvers.go"),
 						Buffer: parseTemplate("node.resolvers.go.tmpl", data),
 					},
 					file{
-						Path:   path.Join(schemaDir, snake(data.Node)+".graphqls"),
+						Path:   path.Join(schemaDir, snake(data.Node.Name)+".graphqls"),
 						Buffer: parseTemplate("node.graphqls.go.tmpl", data),
 					},
 				)

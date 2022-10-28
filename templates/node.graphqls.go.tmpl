@@ -1,25 +1,25 @@
 extend type Query {
-  {{camel .Node}}(id: ID!): {{.Node}}!
+  {{camel .Node.Name}}(id: ID!): {{.Node.Name}}!
 }
 
 extend type Mutation {
-  create{{.Node}}(input: Create{{.Node}}Input!): {{.Node}}!
-  update{{.Node}}(id: ID!, input: Update{{.Node}}Input!): {{.Node}}!
-  delete{{.Node}}(id: ID!): {{.Node}}!
+  create{{.Node.Name}}(input: Create{{.Node.Name}}Input!): {{.Node.Name}}!
+  update{{.Node.Name}}(id: ID!, input: Update{{.Node.Name}}Input!): {{.Node.Name}}!
+  delete{{.Node.Name}}(id: ID!): {{.Node.Name}}!
 }
 
-{{- if .Config.Subscription}}
-input {{plural .Node}}QueryInput {
+{{- if and .Config.Subscription .Node.Subscription}}
+input {{plural .Node.Name}}QueryInput {
   after: Cursor
   first: Int
   before: Cursor
   last: Int
-  orderBy: {{.Node}}Order
-  where: {{.Node}}WhereInput
+  orderBy: {{.Node.Name}}Order
+  where: {{.Node.Name}}WhereInput
 }
 
 extend type Subscription {
-  {{plural .Node | camel}}(event: Event!, query: {{plural .Node}}QueryInput): {{.Node}}Connection!
-  {{camel .Node}}(event: Event!, id: ID!): {{.Node}}!
+  {{plural .Node.Name | camel}}(event: Event!, query: {{plural .Node.Name}}QueryInput): {{.Node.Name}}Connection!
+  {{camel .Node.Name}}(event: Event!, id: ID!): {{.Node.Name}}!
 }
 {{- end}}

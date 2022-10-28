@@ -6,33 +6,35 @@ import (
 )
 {{$g := .}}
 {{range .Nodes}}
-func Notify{{plural .}}Listenners(r *mutationResolver, event {{$g.Config.GqlGen.Model.Package}}.Event) {
-	r.{{plural .}}ListennersMutext.Lock()
-	for key := range r.{{plural .}}Listenners {
-		if event == r.{{plural .}}Listenners[key].Event {
-			query := r.{{plural .}}Listenners[key].Query
+{{- if .Subscription}}
+func Notify{{plural .Name}}Listenners(r *mutationResolver, event {{$g.Config.GqlGen.Model.Package}}.Event) {
+	r.{{plural .Name}}ListennersMutext.Lock()
+	for key := range r.{{plural .Name}}Listenners {
+		if event == r.{{plural .Name}}Listenners[key].Event {
+			query := r.{{plural .Name}}Listenners[key].Query
 			if query == nil {
-				query = &{{$g.Config.GqlGen.Model.Package}}.{{plural .}}QueryInput{}
+				query = &{{$g.Config.GqlGen.Model.Package}}.{{plural .Name}}QueryInput{}
 			}
 
-			entities, err := r.Client.{{.}}.Query().Paginate(r.{{plural .}}Listenners[key].Context, query.After, query.First, query.Before, query.Last, ent.With{{.}}Filter(query.Where.Filter), ent.With{{.}}Order(query.OrderBy))
+			entities, err := r.Client.{{.Name}}.Query().Paginate(r.{{plural .Name}}Listenners[key].Context, query.After, query.First, query.Before, query.Last, ent.With{{.Name}}Filter(query.Where.Filter), ent.With{{.Name}}Order(query.OrderBy))
 
 			if err == nil {
-				r.{{plural .}}Listenners[key].Channel <- entities
+				r.{{plural .Name}}Listenners[key].Channel <- entities
 			}
 
 		}
 	}
-	r.{{plural .}}ListennersMutext.Unlock()
+	r.{{plural .Name}}ListennersMutext.Unlock()
 }
 
-func Notify{{.}}Listenners(r *mutationResolver, event {{$g.Config.GqlGen.Model.Package}}.Event, entity *ent.{{.}}) {
-	r.{{.}}ListennersMutext.Lock()
-	for key := range r.{{.}}Listenners {
-		if event == r.{{.}}Listenners[key].Event && r.{{.}}Listenners[key].ID == entity.ID {
-			r.{{.}}Listenners[key].Channel <- entity
+func Notify{{.Name}}Listenners(r *mutationResolver, event {{$g.Config.GqlGen.Model.Package}}.Event, entity *ent.{{.Name}}) {
+	r.{{.Name}}ListennersMutext.Lock()
+	for key := range r.{{.Name}}Listenners {
+		if event == r.{{.Name}}Listenners[key].Event && r.{{.Name}}Listenners[key].ID == entity.ID {
+			r.{{.Name}}Listenners[key].Channel <- entity
 		}
 	}
-	r.{{.}}ListennersMutext.Unlock()
+	r.{{.Name}}ListennersMutext.Unlock()
 }
+{{- end}}
 {{end}}

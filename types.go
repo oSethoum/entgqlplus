@@ -3,8 +3,8 @@ package entgqlplus
 type (
 	templateData struct {
 		Package string
-		Nodes   []string
-		Node    string
+		Nodes   []node
+		Node    node
 		Config  *config
 	}
 
@@ -17,6 +17,12 @@ type (
 		Subscription bool
 		GqlGenPath   string
 		GqlGen       gqlGen
+	}
+
+	node struct {
+		Name         string
+		Subscription bool
+		Aggregation  bool
 	}
 
 	file struct {

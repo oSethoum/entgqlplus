@@ -17,11 +17,13 @@ type Resolver struct {
 	Client *ent.Client
 	{{- if .Config.Subscription}}
 	{{range .Nodes}}
-	{{.}}Listenners        		    map[*chan *ent.{{.}}]{{.}}Listenner
-	{{.}}ListennersMutext 			  sync.Mutex
-	{{plural .}}Listenners        map[*chan *ent.{{.}}Connection]{{plural .}}Listenner
-	{{plural .}}ListennersMutext  sync.Mutex
-	{{end}}
+	{{- if .Subscription}}
+	{{.Name}}Listenners        		    map[*chan *ent.{{.Name}}]{{.Name}}Listenner
+	{{.Name}}ListennersMutext 			  sync.Mutex
+	{{plural .Name}}Listenners        map[*chan *ent.{{.Name}}Connection]{{plural .Name}}Listenner
+	{{plural .Name}}ListennersMutext  sync.Mutex
+	{{- end}}
+	{{- end}}
 	{{- end}}
 }
 
@@ -33,12 +35,14 @@ func ExecutableSchema() graphql.ExecutableSchema {
 		*schema = {{.Config.GqlGen.Exec.Package}}.NewExecutableSchema({{.Config.GqlGen.Exec.Package}}.Config{Resolvers: &Resolver{
 			Client: db.Client,
 			{{- if .Config.Subscription}}
-			{{range .Nodes}}
-			{{.}}Listenners:        			make(map[*chan *ent.{{.}}]{{.}}Listenner),
-			{{.}}ListennersMutext:  			sync.Mutex{},
-			{{plural .}}Listenners:       make(map[*chan *ent.{{.}}Connection]{{plural .}}Listenner),
-			{{plural .}}ListennersMutext: sync.Mutex{},
-			{{end}}
+			{{- range .Nodes}}
+			{{- if .Subscription}}
+			{{.Name}}Listenners:        			make(map[*chan *ent.{{.Name}}]{{.Name}}Listenner),
+			{{.Name}}ListennersMutext:  			sync.Mutex{},
+			{{plural .Name}}Listenners:       make(map[*chan *ent.{{.Name}}Connection]{{plural .Name}}Listenner),
+			{{plural .Name}}ListennersMutext: sync.Mutex{},
+			{{- end}}
+			{{- end}}
 			{{- end}}
 		}})
 	}

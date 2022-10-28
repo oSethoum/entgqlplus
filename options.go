@@ -7,7 +7,7 @@ type (
 	database        = string
 )
 
-var (
+const (
 	SQLite     database = "sqlite"
 	MySQL      database = "mysql"
 	PostgreSQL database = "postgres"

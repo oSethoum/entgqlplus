@@ -7,17 +7,19 @@ import (
 )
 {{$g := .}}
 {{range .Nodes}}
-type {{.}}Listenner struct {
+{{- if .Subscription}}
+type {{.Name}}Listenner struct {
 	Context context.Context
 	ID      int
 	Event   {{$g.Config.GqlGen.Model.Package}}.Event
-	Channel chan *ent.{{.}}
+	Channel chan *ent.{{.Name}}
 }
 
-type {{plural .}}Listenner struct {
+type {{plural .Name}}Listenner struct {
 	Context context.Context
-	Channel chan *ent.{{.}}Connection
+	Channel chan *ent.{{.Name}}Connection
 	Event   {{$g.Config.GqlGen.Model.Package}}.Event
-	Query   *{{$g.Config.GqlGen.Model.Package}}.{{plural .}}QueryInput
+	Query   *{{$g.Config.GqlGen.Model.Package}}.{{plural .Name}}QueryInput
 }
+{{- end}}
 {{end}}

@@ -27,10 +27,16 @@ func writeFile(f file) {
 	os.WriteFile(f.Path, []byte(f.Buffer), 0666)
 }
 
-func ejectNodes(g *gen.Graph) []string {
-	nodes := []string{}
+func ejectNodes(g *gen.Graph) []node {
+	nodes := []node{}
 	for i := range g.Nodes {
-		nodes = append(nodes, g.Nodes[i].Name)
+		a := &annotation{}
+		a.decode(g.Nodes[i].Annotations[entgqlSchemaKey])
+		n := node{Name: g.Nodes[i].Name}
+		if a.SchemaOptions != nil {
+			n.Subscription = inArray(a.SchemaOptions, Subscription)
+		}
+		nodes = append(nodes, n)
 	}
 	return nodes
 }
@@ -54,4 +60,13 @@ func readGqlGen(fpath string) gqlGen {
 	out.Exec.Dir = path.Dir(out.Exec.FileName)
 	out.Model.Dir = path.Dir(out.Model.FileName)
 	return out
+}
+
+func inArray[T string | int | uint](array []T, value T) bool {
+	for _, v := range array {
+		if v == value {
+			return true
+		}
+	}
+	return false
 }
