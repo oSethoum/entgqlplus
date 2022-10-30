@@ -55,9 +55,22 @@ func WithJWTAuth(b bool) extensionOption {
 
 // WithDatabase(b Database) enables entgqlplus to generate the necessary code to connect to the database and migration.
 // Default value is WithDatabase(entgql.SQLite).
-func WithDatabase(d database) extensionOption {
+func WithDatabase(d database, dbconfig ...string) extensionOption {
 	return func(e *extension) {
 		e.config.Database = d
+		if d == SQLite {
+			if len(dbconfig) == 1 {
+				e.config.DBConfig = dbconfig
+			} else {
+				e.config.DBConfig = []string{"db"}
+			}
+		} else if d == MySQL || d == PostgreSQL {
+			if len(dbconfig) == 3 {
+				e.config.DBConfig = dbconfig
+			} else {
+				e.config.DBConfig = []string{"user", "pass", "db"}
+			}
+		}
 	}
 }
 
@@ -78,6 +91,16 @@ func WithFileUpload(b bool) extensionOption {
 	return func(e *extension) {
 		if e.config.Mutation {
 			e.config.FileUpload = b
+		}
+	}
+}
+
+// WithPrivacy(b bool) adds upload mutation.
+// Default is WithPrivacy(false).
+func WithPrivacy(b bool) extensionOption {
+	return func(e *extension) {
+		if e.config.Mutation {
+			e.config.Privacy = b
 		}
 	}
 }

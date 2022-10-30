@@ -2,6 +2,9 @@ package entgqlplus
 
 import (
 	"embed"
+	"io"
+	"log"
+	"os"
 	"path"
 	"strings"
 
@@ -103,7 +106,7 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 			)
 		}
 
-		if e.config.Subscription {
+		if e.config.Subscription && data.HasSubscription {
 			files = append(files,
 				file{
 					Path:   path.Join(resolverDir, "notifiers.go"),
@@ -127,14 +130,33 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 					Buffer: parseTemplate("auth.middleware.go.tmpl", data),
 				},
 				file{
-					Path:   path.Join(authDir, "privacy.go"),
-					Buffer: parseTemplate("auth.privacy.go.tmpl", data),
-				},
-				file{
 					Path:   path.Join(authDir, "types.go"),
 					Buffer: parseTemplate("auth.types.go.tmpl", data),
 				},
 			)
+		}
+
+		if e.config.Privacy {
+			files = append(files, file{
+				Path:   path.Join(authDir, "privacy.go"),
+				Buffer: parseTemplate("auth.privacy.go.tmpl", data),
+			})
+
+			for _, n := range g.Nodes {
+				fpath := path.Join(path.Dir(e.config.GqlGenPath), "ent/schema/", lower(n.Name)+".go")
+				f, err := os.OpenFile(fpath, os.O_APPEND, 0666)
+				if err != nil {
+					log.Fatalln(fpath, err)
+				}
+				data.Node = node{
+					Name: n.Name,
+				}
+				buff, _ := io.ReadAll(f)
+				if !strings.Contains(string(buff), "Policy") {
+					f.WriteString(parseTemplate("node.privacy.go.tmpl", data))
+				}
+				f.Close()
+			}
 		}
 
 		cleanFiles(resolverDir, schemaDir)

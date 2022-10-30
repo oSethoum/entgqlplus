@@ -3,10 +3,12 @@ package db
 import (
 	"context"
 	"{{.Package}}/ent"
+	"log"
 
 	"entgo.io/ent/dialect/sql/schema"
 	{{- if eq .Config.Database "mysql"}}
 	_ "github.com/go-sql-driver/mysql"
+	"database/sql"
 	{{- end}}
 	
 	{{- if eq .Config.Database "sqlite"}}
@@ -14,6 +16,7 @@ import (
 	{{- end}}
 	
 	{{- if eq .Config.Database "postgres"}}
+	"database/sql"
 	_ "github.com/lib/pq"
 	{{- end}}
 )
@@ -27,11 +30,23 @@ func Init() {
 	{{- end}}
 
 	{{- if eq .Config.Database "mysql"}}
-	client, err := ent.Open("mysql", "<user>:<pass>@tcp(localhost:3306)/<database>")
+	db, err := sql.Open("mysql", "{{index .Config.DBConfig 0}}:{{index .Config.DBConfig 1}}@tcp(localhost:3306)/")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	db.Exec("CREATE DATABASE IF NOT EXISTS ent;")
+	db.Close()
+	client, err := ent.Open("mysql", "{{index .Config.DBConfig 0}}:{{index .Config.DBConfig 1}}@tcp(localhost:3306)/{{index .Config.DBConfig 2}}")
 	{{- end}}
 	
 	{{- if eq .Config.Database "postgres"}}
-	client, err := ent.Open("postgres","host=<host> port=<port> user=<user> dbname=<database> password=<pass>")
+	db, err := sql.Open("postgres", "host=127.0.0.1 port=5432 user={{index .Config.DBConfig 0}} password={{index .Config.DBConfig 1}}")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	db.Exec("CREATE DATABASE IF NOT EXISTS ent;")
+	db.Close()
+	client, err := ent.Open("postgres","host=127.0.0.1 port=5432 user={{index .Config.DBConfig 0}} password={{index .Config.DBConfig 1}} dbname={{index .Config.DBConfig 2}}")
 	{{- end}}
 
 	if err != nil {

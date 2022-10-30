@@ -3,6 +3,9 @@ package main
 import (
 	"{{.Package}}/db"
 	"{{.Package}}/routes"
+	{{- if .Config.Privacy}}
+	_ "{{.Package}}/ent/runtime"
+	{{- end}}
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

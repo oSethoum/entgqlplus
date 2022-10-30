@@ -4,12 +4,14 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 
 	"entgo.io/ent/entc/gen"
 	"gopkg.in/yaml.v3"
 )
 
 var (
+	lower = strings.ToLower
 	camel = gen.Funcs["camel"].(func(string) string)
 	snake = gen.Funcs["snake"].(func(string) string)
 )

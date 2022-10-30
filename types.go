@@ -9,18 +9,21 @@ import (
 
 type (
 	templateData struct {
-		Package  string
-		Nodes    []node
-		Node     node
-		AuthNode node
-		Config   *config
+		Package         string
+		Nodes           []node
+		Node            node
+		AuthNode        node
+		HasSubscription bool
+		Config          *config
 	}
 
 	config struct {
 		Database     database
+		DBConfig     []string
 		Echo         bool
 		JWT          bool
 		Mutation     bool
+		Privacy      bool
 		FileUpload   bool
 		Subscription bool
 		GqlGenPath   string
@@ -66,6 +69,9 @@ func (t *templateData) parse(g *gen.Graph) {
 		n := node{Name: g.Nodes[i].Name}
 		if a.SchemaOptions != nil {
 			n.Subscription = inArray(a.SchemaOptions, Subscription)
+			if n.Subscription {
+				t.HasSubscription = true
+			}
 			as := inArray(a.SchemaOptions, AuthSchema)
 			if as {
 				asCount++
