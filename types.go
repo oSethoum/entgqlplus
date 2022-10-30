@@ -1,11 +1,19 @@
 package entgqlplus
 
+import (
+	"log"
+	"strings"
+
+	"entgo.io/ent/entc/gen"
+)
+
 type (
 	templateData struct {
-		Package string
-		Nodes   []node
-		Node    node
-		Config  *config
+		Package  string
+		Nodes    []node
+		Node     node
+		AuthNode node
+		Config   *config
 	}
 
 	config struct {
@@ -22,7 +30,7 @@ type (
 	node struct {
 		Name         string
 		Subscription bool
-		Aggregation  bool
+		Auth         bool
 	}
 
 	file struct {
@@ -48,3 +56,31 @@ type (
 		} `yaml:"resolver"`
 	}
 )
+
+func (t *templateData) parse(g *gen.Graph) {
+	t.Package = strings.ReplaceAll(g.Package, "/ent", "")
+	asCount := 0
+	for i := range g.Nodes {
+		a := &annotation{}
+		a.decode(g.Nodes[i].Annotations[schemaAnnotationKey])
+		n := node{Name: g.Nodes[i].Name}
+		if a.SchemaOptions != nil {
+			n.Subscription = inArray(a.SchemaOptions, Subscription)
+			as := inArray(a.SchemaOptions, AuthSchema)
+			if as {
+				asCount++
+				if asCount > 1 {
+					log.Fatalln("entgqlplus: can't use more than one AuthSchema")
+				}
+				t.AuthNode = n
+			}
+		}
+		t.Nodes = append(t.Nodes, n)
+	}
+
+	if t.Config.JWT {
+		if asCount == 0 {
+			log.Fatalln("entgqlplus: No auth schema found, use entgqlplus.AuthSchema()")
+		}
+	}
+}

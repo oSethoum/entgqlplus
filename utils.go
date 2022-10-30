@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"strings"
 
 	"entgo.io/ent/entc/gen"
 	"gopkg.in/yaml.v3"
@@ -25,24 +24,6 @@ func writeFile(f file) {
 	err := os.MkdirAll(path.Dir(f.Path), 0666)
 	catch(err)
 	os.WriteFile(f.Path, []byte(f.Buffer), 0666)
-}
-
-func ejectNodes(g *gen.Graph) []node {
-	nodes := []node{}
-	for i := range g.Nodes {
-		a := &annotation{}
-		a.decode(g.Nodes[i].Annotations[entgqlSchemaKey])
-		n := node{Name: g.Nodes[i].Name}
-		if a.SchemaOptions != nil {
-			n.Subscription = inArray(a.SchemaOptions, Subscription)
-		}
-		nodes = append(nodes, n)
-	}
-	return nodes
-}
-
-func ejectPackage(g *gen.Graph) string {
-	return strings.ReplaceAll(g.Package, "/ent", "")
 }
 
 func catch(err error) {
@@ -69,4 +50,9 @@ func inArray[T string | int | uint](array []T, value T) bool {
 		}
 	}
 	return false
+}
+
+func cleanFiles(resolverDir, schemaDir string) {
+	os.RemoveAll(resolverDir)
+	os.RemoveAll(schemaDir)
 }

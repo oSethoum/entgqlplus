@@ -3,6 +3,7 @@ package entgqlplus
 import (
 	"embed"
 	"path"
+	"strings"
 
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
@@ -22,12 +23,14 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 		files := []file{}
 		schemaDir := path.Join(path.Dir(e.config.GqlGenPath), path.Dir(e.config.GqlGen.Schema[0]))
 		resolverDir := path.Join(path.Dir(e.config.GqlGenPath), e.config.GqlGen.Resolver.Dir)
+		dbDir := path.Join(path.Dir(e.config.GqlGenPath), "db")
+		authDir := path.Join(path.Dir(e.config.GqlGenPath), "auth")
 
 		data := &templateData{
-			Config:  e.config,
-			Package: ejectPackage(g),
-			Nodes:   ejectNodes(g),
+			Config: e.config,
 		}
+
+		data.parse(g)
 
 		files = append(files,
 			file{
@@ -81,7 +84,7 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 		if len(e.config.Database) > 0 {
 			files = append(files,
 				file{
-					Path:   path.Join(path.Dir(e.config.GqlGenPath), "db/db.go"),
+					Path:   path.Join(dbDir, "db.go"),
 					Buffer: parseTemplate("db.go.tmpl", data),
 				},
 			)
@@ -113,6 +116,28 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 			)
 		}
 
+		if e.config.JWT {
+			files = append(files,
+				file{
+					Path:   path.Join(authDir, "login.go"),
+					Buffer: parseTemplate("auth.login.go.tmpl", data),
+				},
+				file{
+					Path:   path.Join(authDir, "middleware.go"),
+					Buffer: parseTemplate("auth.middleware.go.tmpl", data),
+				},
+				file{
+					Path:   path.Join(authDir, "privacy.go"),
+					Buffer: parseTemplate("auth.privacy.go.tmpl", data),
+				},
+				file{
+					Path:   path.Join(authDir, "types.go"),
+					Buffer: parseTemplate("auth.types.go.tmpl", data),
+				},
+			)
+		}
+
+		cleanFiles(resolverDir, schemaDir)
 		writeFiles(files)
 
 		return next.Generate(g)
@@ -143,6 +168,7 @@ func NewExtension(opts ...extensionOption) *extension {
 	}
 
 	gen.Funcs["camel"] = func(s string) string { return camel(snake(s)) }
+	gen.Funcs["lower"] = strings.ToLower
 
 	ex.config.GqlGen = readGqlGen(ex.config.GqlGenPath)
 	ex.hooks = append(ex.hooks, ex.generate)

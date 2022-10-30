@@ -3,6 +3,7 @@ package entgqlplus
 import "encoding/json"
 
 type schmeaAnnotationOption = uint
+type authFieldGroup = int8
 
 type annotation struct {
 	name          string
@@ -10,15 +11,22 @@ type annotation struct {
 }
 
 const (
-	Subscription schmeaAnnotationOption = iota << 1
+	Subscription schmeaAnnotationOption = iota << 0
+	AuthSchema
 )
 
 const (
-	entgqlSchemaKey = "entgqlSchema"
+	schemaAnnotationKey    = "entgqlSchema"
+	authFieldAnnotationKey = "entgqlAuthField"
+)
+
+const (
+	And authFieldGroup = iota << 1
+	Or
 )
 
 func (a *annotation) Name() string {
-	return entgqlSchemaKey
+	return a.name
 }
 
 func (a *annotation) decode(v interface{}) error {
@@ -31,7 +39,7 @@ func (a *annotation) decode(v interface{}) error {
 
 func SchemaAnnotation(options ...schmeaAnnotationOption) *annotation {
 	return &annotation{
-		name:          entgqlSchemaKey,
+		name:          schemaAnnotationKey,
 		SchemaOptions: options,
 	}
 }
