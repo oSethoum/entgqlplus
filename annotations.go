@@ -16,13 +16,7 @@ const (
 )
 
 const (
-	schemaAnnotationKey    = "entgqlSchema"
-	authFieldAnnotationKey = "entgqlAuthField"
-)
-
-const (
-	And authFieldGroup = iota << 1
-	Or
+	schemaAnnotationKey = "entgqlSchema"
 )
 
 func (a *annotation) Name() string {
