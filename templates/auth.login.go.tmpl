@@ -12,8 +12,8 @@ import (
 
 func Login(c echo.Context) error {
 	ctx := context.Background()
-	var input Input
-	c.Bind(&input)
+	input := new(Input)
+	c.Bind(input)
 
 	// check if the user is valid
 	_, err := db.Client.{{pascal .AuthNode.Name}}.Query().First(ctx)
