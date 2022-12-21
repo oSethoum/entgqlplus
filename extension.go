@@ -51,111 +51,152 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 			},
 		)
 
-		if e.config.Mutation {
-			for i := range data.Nodes {
-				data.Node = data.Nodes[i]
-				files = append(files,
-					file{
-						Path:   path.Join(resolverDir, snake(data.Node.Name)+".resolvers.go"),
-						Buffer: parseTemplate("node.resolvers.go.tmpl", data),
-					},
-					file{
-						Path:   path.Join(schemaDir, snake(data.Node.Name)+".graphqls"),
-						Buffer: parseTemplate("node.graphqls.go.tmpl", data),
-					},
-				)
+		if e.config.Mutation != nil {
+			if *e.config.Mutation {
+				for i := range data.Nodes {
+					data.Node = data.Nodes[i]
+					files = append(files,
+						file{
+							Path:   path.Join(resolverDir, snake(data.Node.Name)+".resolvers.go"),
+							Buffer: parseTemplate("node.resolvers.go.tmpl", data),
+						},
+						file{
+							Path:   path.Join(schemaDir, snake(data.Node.Name)+".graphqls"),
+							Buffer: parseTemplate("node.graphqls.go.tmpl", data),
+						},
+					)
+				}
+			} else {
+				// delete the files
+				for _, n := range data.Nodes {
+					os.Remove(path.Join(schemaDir, snake(data.Node.Name)+".graphqls"))
+					os.Remove(path.Join(resolverDir, snake(n.Name)+".resolvers.go"))
+				}
 			}
 		}
 
-		if e.config.Echo {
-			files = append(files,
-				file{
-					Path:   path.Join(path.Dir(e.config.GqlGenPath), "routes/routes.go"),
-					Buffer: parseTemplate("routes.go.tmpl", data),
-				},
-				file{
-					Path:   path.Join(path.Dir(e.config.GqlGenPath), "handlers/handlers.go"),
-					Buffer: parseTemplate("handlers.go.tmpl", data),
-				},
-				file{
-					Path:   path.Join(path.Dir(e.config.GqlGenPath), "server.go"),
-					Buffer: parseTemplate("server.go.tmpl", data),
-				},
-			)
+		if e.config.Echo != nil {
+			if *e.config.Echo {
+				files = append(files,
+					file{
+						Path:   path.Join(path.Dir(e.config.GqlGenPath), "routes/routes.go"),
+						Buffer: parseTemplate("routes.go.tmpl", data),
+					},
+					file{
+						Path:   path.Join(path.Dir(e.config.GqlGenPath), "handlers/handlers.go"),
+						Buffer: parseTemplate("handlers.go.tmpl", data),
+					},
+					file{
+						Path:   path.Join(path.Dir(e.config.GqlGenPath), "server.go"),
+						Buffer: parseTemplate("server.go.tmpl", data),
+					},
+				)
+			} else {
+				// delete the files
+				os.Remove(path.Join(path.Dir(e.config.GqlGenPath), "routes/routes.go"))
+				os.Remove(path.Join(path.Dir(e.config.GqlGenPath), "handlers/handlers.go"))
+				os.Remove(path.Join(path.Dir(e.config.GqlGenPath), "server.go"))
+			}
+		}
+		if len(e.config.Database) == 0 {
+			if len(e.config.Database) > 0 {
+				files = append(files,
+					file{
+						Path:   path.Join(dbDir, "db.go"),
+						Buffer: parseTemplate("db.go.tmpl", data),
+					},
+				)
+			} else {
+				// delete the files
+				os.Remove(path.Join(dbDir, "db.go"))
+			}
 		}
 
-		if len(e.config.Database) > 0 {
-			files = append(files,
-				file{
-					Path:   path.Join(dbDir, "db.go"),
-					Buffer: parseTemplate("db.go.tmpl", data),
-				},
-			)
+		if e.config.FileUpload != nil {
+			if *e.config.FileUpload {
+				files = append(files,
+					file{
+						Path:   path.Join(resolverDir, "upload.resolvers.go"),
+						Buffer: parseTemplate("upload.resolvers.go.tmpl", data),
+					},
+					file{
+						Path:   path.Join(schemaDir, "upload.graphqls"),
+						Buffer: parseTemplate("upload.graphqls.go.tmpl", nil),
+					},
+				)
+			} else {
+				// delete the files
+				os.Remove(path.Join(resolverDir, "upload.resolvers.go"))
+				os.Remove(path.Join(schemaDir, "upload.graphqls"))
+			}
 		}
 
-		if e.config.FileUpload {
-			files = append(files,
-				file{
-					Path:   path.Join(resolverDir, "upload.resolvers.go"),
-					Buffer: parseTemplate("upload.resolvers.go.tmpl", data),
-				},
-				file{
-					Path:   path.Join(schemaDir, "upload.graphqls"),
-					Buffer: parseTemplate("upload.graphqls.go.tmpl", nil),
-				},
-			)
+		if e.config.Subscription != nil {
+			if *e.config.Subscription && data.HasSubscription {
+				files = append(files,
+					file{
+						Path:   path.Join(resolverDir, "notifiers.go"),
+						Buffer: parseTemplate("notifiers.go.tmpl", data),
+					},
+					file{
+						Path:   path.Join(resolverDir, "types.go"),
+						Buffer: parseTemplate("types.go.tmpl", data),
+					},
+				)
+			} else {
+				// delete the files
+				os.Remove(path.Join(resolverDir, "notifiers.go"))
+				os.Remove(path.Join(resolverDir, "types.go"))
+			}
 		}
 
-		if e.config.Subscription && data.HasSubscription {
-			files = append(files,
-				file{
-					Path:   path.Join(resolverDir, "notifiers.go"),
-					Buffer: parseTemplate("notifiers.go.tmpl", data),
-				},
-				file{
-					Path:   path.Join(resolverDir, "types.go"),
-					Buffer: parseTemplate("types.go.tmpl", data),
-				},
-			)
+		if e.config.JWT != nil {
+			if *e.config.JWT {
+				files = append(files,
+					file{
+						Path:   path.Join(authDir, "login.go"),
+						Buffer: parseTemplate("auth.login.go.tmpl", data),
+					},
+					file{
+						Path:   path.Join(authDir, "middleware.go"),
+						Buffer: parseTemplate("auth.middleware.go.tmpl", data),
+					},
+					file{
+						Path:   path.Join(authDir, "types.go"),
+						Buffer: parseTemplate("auth.types.go.tmpl", data),
+					},
+				)
+			} else {
+				// delete the files
+				os.Remove(path.Join(authDir, "login.go"))
+				os.Remove(path.Join(authDir, "middleware.go"))
+				os.Remove(path.Join(authDir, "types.go"))
+			}
 		}
 
-		if e.config.JWT {
-			files = append(files,
-				file{
-					Path:   path.Join(authDir, "login.go"),
-					Buffer: parseTemplate("auth.login.go.tmpl", data),
-				},
-				file{
-					Path:   path.Join(authDir, "middleware.go"),
-					Buffer: parseTemplate("auth.middleware.go.tmpl", data),
-				},
-				file{
-					Path:   path.Join(authDir, "types.go"),
-					Buffer: parseTemplate("auth.types.go.tmpl", data),
-				},
-			)
-		}
-
-		if e.config.Privacy {
-			files = append(files, file{
-				Path:   path.Join(authDir, "privacy.go"),
-				Buffer: parseTemplate("auth.privacy.go.tmpl", data),
-			})
-
-			for _, n := range g.Nodes {
-				fpath := path.Join(path.Dir(e.config.GqlGenPath), "ent/schema/", lower(n.Name)+".go")
-				f, err := os.OpenFile(fpath, os.O_APPEND, 0666)
-				if err != nil {
-					log.Fatalln(fpath, err)
+		if e.config.Privacy != nil {
+			if *e.config.Privacy {
+				files = append(files, file{
+					Path:   path.Join(authDir, "privacy.go"),
+					Buffer: parseTemplate("auth.privacy.go.tmpl", data),
+				})
+				for _, n := range g.Nodes {
+					fpath := path.Join(path.Dir(e.config.GqlGenPath), "ent/schema/", lower(n.Name)+".go")
+					f, err := os.OpenFile(fpath, os.O_APPEND, 0666)
+					if err != nil {
+						log.Fatalln(fpath, err)
+					}
+					data.Node = node{
+						Name: n.Name,
+					}
+					buff, _ := io.ReadAll(f)
+					if !strings.Contains(string(buff), "Policy") {
+						f.WriteString(parseTemplate("node.privacy.go.tmpl", data))
+					}
+					f.Close()
 				}
-				data.Node = node{
-					Name: n.Name,
-				}
-				buff, _ := io.ReadAll(f)
-				if !strings.Contains(string(buff), "Policy") {
-					f.WriteString(parseTemplate("node.privacy.go.tmpl", data))
-				}
-				f.Close()
+			} else {
+				// delete the files
 			}
 		}
 
@@ -174,13 +215,13 @@ func NewExtension(opts ...extensionOption) *extension {
 	ex := &extension{
 		// Default Config
 		config: &config{
-			FileUpload:   false,
-			Subscription: false,
-			Mutation:     false,
-			Database:     SQLite,
-			Echo:         false,
+			FileUpload:   nil,
+			Subscription: nil,
+			Mutation:     nil,
+			Database:     "",
+			Echo:         nil,
 			GqlGenPath:   "../gqlgen.yaml",
-			JWT:          false,
+			JWT:          nil,
 		},
 		hooks: []gen.Hook{},
 	}

@@ -20,12 +20,12 @@ type (
 	config struct {
 		Database     database
 		DBConfig     []string
-		Echo         bool
-		JWT          bool
-		Mutation     bool
-		Privacy      bool
-		FileUpload   bool
-		Subscription bool
+		Echo         *bool
+		JWT          *bool
+		Mutation     *bool
+		Privacy      *bool
+		FileUpload   *bool
+		Subscription *bool
 		GqlGenPath   string
 		GqlGen       gqlGen
 	}
@@ -84,7 +84,7 @@ func (t *templateData) parse(g *gen.Graph) {
 		t.Nodes = append(t.Nodes, n)
 	}
 
-	if t.Config.JWT {
+	if *t.Config.JWT {
 		if asCount == 0 {
 			log.Fatalln("entgqlplus: No auth schema found, use entgqlplus.AuthSchema()")
 		}
