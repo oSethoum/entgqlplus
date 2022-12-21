@@ -195,8 +195,6 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 					}
 					f.Close()
 				}
-			} else {
-				// delete the files
 			}
 		}
 

@@ -14,7 +14,7 @@ const (
 )
 
 // WithMutation(b bool) enables entgqlplus to generate the Mutations.
-// Default value is WithMutation(false).
+// Default value is nil
 func WithMutation(b bool) extensionOption {
 	return func(e *extension) {
 		*e.config.Mutation = b
@@ -23,38 +23,32 @@ func WithMutation(b bool) extensionOption {
 
 // WithSubscription(b bool) enables entgqlplus to generate the Subscriptions.
 // Works only if WithMutation(true) is enabled.
-// Default value is WithSubscription(false).
+// Default value is nil
 func WithSubscription(b bool) extensionOption {
 	return func(e *extension) {
-		if *e.config.Mutation {
-			*e.config.Subscription = b
-		}
+		*e.config.Subscription = b
 	}
 }
 
 // WithEchoServer(b bool) enables entgqlplus to generate the server, routes and the handlers.
-// Default value is WithEchoServer(false).
+// Default value is nil
 func WithEchoServer(b bool) extensionOption {
 	return func(e *extension) {
-		if b && !*e.config.Echo {
-			*e.config.Echo = b
-		}
+		*e.config.Echo = b
 	}
 }
 
 // WithJWTAuth(b bool) enables entgqlplus to generate the login route and the Protected middleware
 // Works only if WithEcho(true) is enabled.
-// Default value is WithJWTAuth(false).
+// Default value is nil
 func WithJWTAuth(b bool) extensionOption {
 	return func(e *extension) {
-		if *e.config.Echo {
-			*e.config.JWT = b
-		}
+		*e.config.JWT = b
 	}
 }
 
 // WithDatabase(b Database) enables entgqlplus to generate the necessary code to connect to the database and migration.
-// Default value is WithDatabase(entgql.SQLite).
+// Default value is ""
 func WithDatabase(d database, dbconfig ...string) extensionOption {
 	return func(e *extension) {
 		e.config.Database = d
@@ -86,21 +80,17 @@ func WithConfigPath(p string) extensionOption {
 
 // WithFileUpload(b bool) adds upload mutation.
 // this only works if WithMutation(true) is enabled.
-// Default is WithFileUpload(false).
+// Default is nil
 func WithFileUpload(b bool) extensionOption {
 	return func(e *extension) {
-		if *e.config.Mutation {
-			*e.config.FileUpload = b
-		}
+		*e.config.FileUpload = b
 	}
 }
 
 // WithPrivacy(b bool) adds upload mutation.
-// Default is WithPrivacy(false).
+// Default is nil
 func WithPrivacy(b bool) extensionOption {
 	return func(e *extension) {
-		if *e.config.Mutation {
-			*e.config.Privacy = b
-		}
+		*e.config.Privacy = b
 	}
 }
