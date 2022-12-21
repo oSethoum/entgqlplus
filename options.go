@@ -17,7 +17,7 @@ const (
 // Default value is nil
 func WithMutation(b bool) extensionOption {
 	return func(e *extension) {
-		*e.config.Mutation = b
+		e.config.Mutation = &b
 	}
 }
 
@@ -26,7 +26,7 @@ func WithMutation(b bool) extensionOption {
 // Default value is nil
 func WithSubscription(b bool) extensionOption {
 	return func(e *extension) {
-		*e.config.Subscription = b
+		e.config.Subscription = &b
 	}
 }
 
@@ -34,7 +34,7 @@ func WithSubscription(b bool) extensionOption {
 // Default value is nil
 func WithEchoServer(b bool) extensionOption {
 	return func(e *extension) {
-		*e.config.Echo = b
+		e.config.Echo = &b
 	}
 }
 
@@ -43,7 +43,7 @@ func WithEchoServer(b bool) extensionOption {
 // Default value is nil
 func WithJWTAuth(b bool) extensionOption {
 	return func(e *extension) {
-		*e.config.JWT = b
+		e.config.JWT = &b
 	}
 }
 
@@ -83,7 +83,7 @@ func WithConfigPath(p string) extensionOption {
 // Default is nil
 func WithFileUpload(b bool) extensionOption {
 	return func(e *extension) {
-		*e.config.FileUpload = b
+		e.config.FileUpload = &b
 	}
 }
 
@@ -91,6 +91,6 @@ func WithFileUpload(b bool) extensionOption {
 // Default is nil
 func WithPrivacy(b bool) extensionOption {
 	return func(e *extension) {
-		*e.config.Privacy = b
+		e.config.Privacy = &b
 	}
 }
