@@ -84,9 +84,11 @@ func (t *templateData) parse(g *gen.Graph) {
 		t.Nodes = append(t.Nodes, n)
 	}
 
-	if *t.Config.JWT {
-		if asCount == 0 {
-			log.Fatalln("entgqlplus: No auth schema found, use entgqlplus.AuthSchema()")
+	if t.Config.JWT != nil {
+		if *t.Config.JWT {
+			if asCount == 0 {
+				log.Fatalln("entgqlplus: No auth schema found, use entgqlplus.AuthSchema()")
+			}
 		}
 	}
 }
