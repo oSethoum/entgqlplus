@@ -29,15 +29,15 @@ func main() {
 	files := []file{
 		{
 			Path:   "gqlgen.yaml",
-			Buffer: parseTemplate("gqlgen.go.yml", data),
+			Buffer: parseTemplate("gqlgen.go.tmpl", data),
 		},
 		{
 			Path:   "ent/generate/entc.go",
-			Buffer: parseTemplate("entc.go.yml", data),
+			Buffer: parseTemplate("entc.go.tmpl", data),
 		},
 		{
 			Path:   "ent/generate/generate.go",
-			Buffer: parseTemplate("generate.go.yml", data),
+			Buffer: parseTemplate("generate.go.tmpl", data),
 		},
 	}
 
