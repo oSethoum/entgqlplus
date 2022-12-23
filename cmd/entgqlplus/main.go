@@ -28,7 +28,7 @@ func main() {
 	data := &templateData{}
 	files := []file{
 		{
-			Path:   "gqlgen.yaml",
+			Path:   "gqlgen.yml",
 			Buffer: parseTemplate("gqlgen.go.tmpl", data),
 		},
 		{

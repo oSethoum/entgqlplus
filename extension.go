@@ -98,18 +98,16 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 				os.Remove(path.Join(path.Dir(e.config.GqlGenPath), "server.go"))
 			}
 		}
-		if len(e.config.Database) == 0 {
-			if len(e.config.Database) > 0 {
-				files = append(files,
-					file{
-						Path:   path.Join(dbDir, "db.go"),
-						Buffer: parseTemplate("db.go.tmpl", data),
-					},
-				)
-			} else {
-				// delete the files
-				os.Remove(path.Join(dbDir, "db.go"))
-			}
+		if len(e.config.Database) > 0 {
+			files = append(files,
+				file{
+					Path:   path.Join(dbDir, "db.go"),
+					Buffer: parseTemplate("db.go.tmpl", data),
+				},
+			)
+		} else {
+			// delete the files
+			os.RemoveAll(dbDir)
 		}
 
 		if e.config.FileUpload != nil {
