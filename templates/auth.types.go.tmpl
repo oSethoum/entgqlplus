@@ -9,6 +9,6 @@ type Claims struct {
 }
 
 type Response struct {
-	Errors interface{} `json:"error"`
-	Data   interface{} `json:"data"`
+	Errors interface{} `json:"error,omitempty"`
+	Data   interface{} `json:"data,omitempty"`
 }

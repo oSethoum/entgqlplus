@@ -2,8 +2,6 @@ package entgqlplus
 
 import (
 	"embed"
-	"io"
-	"log"
 	"os"
 	"path"
 	"strings"
@@ -14,6 +12,7 @@ import (
 
 //go:embed templates
 var assets embed.FS
+var maxLine = 1000000
 
 type extension struct {
 	entc.DefaultExtension
@@ -47,7 +46,7 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 
 			file{
 				Path:   path.Join(schemaDir, "types.graphqls"),
-				Buffer: parseTemplate("types.graphqls.go.tmpl", nil),
+				Buffer: parseTemplate("types.graphqls.go.tmpl", data),
 			},
 		)
 
@@ -119,7 +118,7 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 					},
 					file{
 						Path:   path.Join(schemaDir, "upload.graphqls"),
-						Buffer: parseTemplate("upload.graphqls.go.tmpl", nil),
+						Buffer: parseTemplate("upload.graphqls.go.tmpl", data),
 					},
 				)
 			} else {
@@ -180,18 +179,50 @@ func (e *extension) generate(next gen.Generator) gen.Generator {
 				})
 				for _, n := range g.Nodes {
 					fpath := path.Join(path.Dir(e.config.GqlGenPath), "ent/schema/", lower(n.Name)+".go")
-					f, err := os.OpenFile(fpath, os.O_APPEND, 0666)
-					if err != nil {
-						log.Fatalln(fpath, err)
-					}
+
 					data.Node = node{
 						Name: n.Name,
 					}
-					buff, _ := io.ReadAll(f)
-					if !strings.Contains(string(buff), "Policy") {
-						f.WriteString(parseTemplate("node.privacy.go.tmpl", data))
+					addedLines := []string{
+						"\t\"" + path.Join(data.Package, "/auth") + "\"",
+						"\t\"" + path.Join(data.Package, "/ent/privacy") + "\"",
 					}
-					f.Close()
+
+					check := []string{
+						path.Join(data.Package, "/auth"),
+						path.Join(data.Package, "/ent/privacy"),
+					}
+					str := appendLines(fpath, addedLines, 4, beforeMode, check)
+					privacybuffer := parseTemplate("node.privacy.go.tmpl", data)
+					if !strings.Contains(str, "// Policy defines the privacy policy of the") {
+						str += "\n" + privacybuffer
+					}
+					writeFile(file{
+						Path:   fpath,
+						Buffer: str,
+					})
+				}
+			} else {
+				os.Remove(path.Join(authDir, "privacy.go"))
+				for _, n := range g.Nodes {
+					fpath := path.Join(path.Dir(e.config.GqlGenPath), "ent/schema/", lower(n.Name)+".go")
+					buffer, err := os.ReadFile(fpath)
+					if err != nil {
+						panic(err)
+					}
+					removedLines := []removeLine{
+						{
+							substr: "// Policy defines the privacy policy",
+							end:    true,
+						},
+						{substr: path.Join(data.Package, "/auth")},
+						{substr: path.Join(data.Package, "/ent/privacy")},
+					}
+					newBuffer := removeLines(string(buffer), removedLines)
+					writeFile(file{
+						Path:   fpath,
+						Buffer: newBuffer,
+					})
 				}
 			}
 		}

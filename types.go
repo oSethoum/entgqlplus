@@ -58,6 +58,11 @@ type (
 			Package string `yaml:"package"`
 		} `yaml:"resolver"`
 	}
+	pair struct {
+		start int
+		end   int
+	}
+	appendMode string
 )
 
 func (t *templateData) parse(g *gen.Graph) {

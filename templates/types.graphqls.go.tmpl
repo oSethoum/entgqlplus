@@ -1,7 +1,9 @@
 scalar Time
 
+{{- if .Config.Subscription}}
 enum Event {
   CREATE
   UPDATE
   DELETE
 }
+{{- end}}

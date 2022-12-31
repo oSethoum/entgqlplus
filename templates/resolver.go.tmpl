@@ -6,8 +6,9 @@ import (
 	"{{.Package}}/{{.Config.GqlGen.Exec.Dir}}"
 
 	"github.com/99designs/gqlgen/graphql"
-	
+	{{- if .Config.Subscription}}
 	"sync"
+	{{- end}}
 )
 
 // This file will not be regenerated automatically.

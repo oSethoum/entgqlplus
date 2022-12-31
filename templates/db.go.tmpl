@@ -50,7 +50,7 @@ func Init() {
 	{{- end}}
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	err = client.Schema.Create(
