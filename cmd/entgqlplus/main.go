@@ -40,7 +40,7 @@ func main() {
 			Buffer: parseTemplate("generate.go.tmpl", data),
 		},
 	}
-
+	os.Mkdir("ent/schema", 0666)
 	writeFiles(files)
 }
 
