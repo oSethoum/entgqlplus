@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 	"text/template"
 
 	"entgo.io/ent/entc/gen"
@@ -13,6 +14,7 @@ import (
 
 type (
 	templateData struct {
+		Pkg string
 	}
 
 	file struct {
@@ -25,7 +27,20 @@ type (
 var assets embed.FS
 
 func main() {
-	data := &templateData{}
+	// check teh go.mpd file if found get the package from it
+	buff, err := os.ReadFile("go.mod")
+	if err != nil {
+		log.Fatalln("Cannot find the file go.mod")
+	}
+
+	pkg := strings.ReplaceAll(strings.Split(strings.Split(string(buff), "\n")[0], " ")[1], " ", "")
+	if pkg == "" {
+		log.Fatalln("Unable to read package from go.mod")
+	}
+
+	data := &templateData{
+		Pkg: pkg,
+	}
 	files := []file{
 		{
 			Path:   "gqlgen.yml",
