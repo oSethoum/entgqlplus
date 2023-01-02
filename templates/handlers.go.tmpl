@@ -3,15 +3,18 @@ package handlers
 import (
 	"{{.Package}}/db"
 	"{{.Package}}/{{.Config.GqlGen.Resolver.Dir}}"
-	"net/http"
+
+{{- if .Config.Subscription}}
 	"time"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"net/http"
+	"github.com/gorilla/websocket"
+	{{- end}}
 
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 )
 
@@ -28,7 +31,7 @@ func GraphqlHandler(c echo.Context) error {
 	h.ServeHTTP(c.Response(), c.Request())
 	return nil
 }
-
+{{- if .Config.Subscription}}
 func GraphqlWsHandler(c echo.Context) error {
 	h := handler.New({{.Config.GqlGen.Resolver.Package}}.ExecutableSchema())
 	h.Use(extension.Introspection{})
@@ -44,3 +47,4 @@ func GraphqlWsHandler(c echo.Context) error {
 	h.ServeHTTP(c.Response(), c.Request())
 	return nil
 }
+{{- end}}
