@@ -58,10 +58,6 @@ type (
 			Package string `yaml:"package"`
 		} `yaml:"resolver"`
 	}
-	pair struct {
-		start int
-		end   int
-	}
 	appendMode string
 )
 
@@ -69,6 +65,9 @@ func (t *templateData) parse(g *gen.Graph) {
 	t.Package = strings.ReplaceAll(g.Package, "/ent", "")
 	asCount := 0
 	for i := range g.Nodes {
+		if len(g.Nodes[i].Fields) == 0 {
+			continue
+		}
 		a := &annotation{}
 		a.decode(g.Nodes[i].Annotations[schemaAnnotationKey])
 		n := node{Name: g.Nodes[i].Name}

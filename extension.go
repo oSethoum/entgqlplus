@@ -12,7 +12,6 @@ import (
 
 //go:embed templates
 var assets embed.FS
-var maxLine = 1000000
 
 type extension struct {
 	entc.DefaultExtension
