@@ -55,15 +55,15 @@ func main() {
 			Buffer: parseTemplate("generate.go.tmpl", data),
 		},
 	}
-	os.Mkdir("ent/schema", 0666)
+	os.Mkdir("ent/schema", 0777)
 	writeFiles(files)
 }
 
 func writeFiles(files []file) {
 	for _, f := range files {
-		err := os.MkdirAll(path.Dir(f.Path), 0666)
+		err := os.MkdirAll(path.Dir(f.Path), 0777)
 		catch(err)
-		os.WriteFile(f.Path, []byte(f.Buffer), 0666)
+		os.WriteFile(f.Path, []byte(f.Buffer), 0777)
 	}
 }
 

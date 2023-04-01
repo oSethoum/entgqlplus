@@ -17,6 +17,6 @@ func (r *mutationResolver) Upload(ctx context.Context, input graphql.Upload) (bo
 	if err != nil {
 		return false, err
 	}
-	err = os.WriteFile(input.Filename, out, 0666)
+	err = os.WriteFile(input.Filename, out, 0777)
 	return true, err
 }

@@ -26,9 +26,9 @@ func writeFiles(files []file) {
 }
 
 func writeFile(f file) {
-	err := os.MkdirAll(path.Dir(f.Path), 0666)
+	err := os.MkdirAll(path.Dir(f.Path), 0777)
 	catch(err)
-	os.WriteFile(f.Path, []byte(f.Buffer), 0666)
+	os.WriteFile(f.Path, []byte(f.Buffer), 0777)
 }
 
 func readFile(filePath string) string {
